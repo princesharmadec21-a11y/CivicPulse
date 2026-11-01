@@ -200,53 +200,178 @@ CivicPulse includes pre-configured municipal accounts for testing:
 
 ---
 
-## 💻 Getting Started & Local Development
+---
 
-### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
+## 💻 How to Locally Host and Run CivicPulse (Step-by-Step Guide)
 
-### Installation
+Follow this complete guide to download, install, configure, and host CivicPulse locally on your machine (Windows, macOS, or Linux).
 
-1. **Clone the repository**:
+---
+
+### 1. Prerequisites Checklist
+Before starting, ensure you have the following installed on your computer:
+- **Node.js**: `v18.0.0` or higher (`v20.x` or `v22.x` recommended). Verify with:
+  ```bash
+  node -v
+  ```
+- **npm**: `v9.0.0` or higher (comes bundled with Node.js). Verify with:
+  ```bash
+  npm -v
+  ```
+- **Git**: (Optional, for cloning). Verify with `git --version`.
+
+---
+
+### 2. Download the Source Code
+
+#### Option A: Clone via Git
+Open your terminal or command prompt:
+```bash
+git clone https://github.com/your-username/civicpulse.git
+cd civicpulse
+```
+
+#### Option B: Download as ZIP
+1. Download the repository ZIP file from GitHub or AI Studio.
+2. Extract the ZIP into a folder of your choice (e.g. `C:\Projects\CivicPulse` or `~/Projects/CivicPulse`).
+3. Open your terminal in that folder:
    ```bash
-   git clone https://github.com/your-username/civicpulse.git
-   cd civicpulse
+   cd path/to/CivicPulse
    ```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+---
 
-3. **Configure Environment Variables**:
-   Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-   Add your Gemini API key (optional for local testing, as the platform contains a built-in heuristic fallback engine):
+### 3. Install Dependencies
+Run the following command to download all required frontend and backend packages:
+```bash
+npm install
+```
+*This installs React 19, Tailwind CSS v4, Express.js, Leaflet, `@google/genai`, Lucide icons, Motion, and development tools.*
+
+---
+
+### 4. Configure Environment Variables (`.env`)
+1. Create a `.env` file in the root directory by copying the example file:
+   - **On macOS / Linux**:
+     ```bash
+     cp .env.example .env
+     ```
+   - **On Windows (Command Prompt)**:
+     ```cmd
+     copy .env.example .env
+     ```
+   - **On Windows (PowerShell)**:
+     ```powershell
+     Copy-Item .env.example .env
+     ```
+
+2. Open `.env` in any text editor (VS Code, Notepad, etc.):
    ```env
-   GEMINI_API_KEY="your-gemini-api-key"
+   # GEMINI_API_KEY: (Optional) Your Google Gemini API Key.
+   # Get a free key at: https://aistudio.google.com/
+   GEMINI_API_KEY="your-gemini-api-key-here"
+
+   # PORT: Local server port (Default: 3000)
    PORT=3000
    ```
+   > 💡 **No API key? No problem!** CivicPulse includes an **intelligent fallback AI heuristic engine**. The app will run, classify photos, assign departments, and detect priorities even if `GEMINI_API_KEY` is not provided.
 
-4. **Run Pure Logic Unit Tests**:
-   ```bash
-   npx tsx --test src/utils/civic-rules.test.ts
+---
+
+### 5. Run the Local Development Server
+Start the unified full-stack server (Express API + Vite React Dev Middleware):
+```bash
+npm run dev
+```
+
+You will see terminal output similar to:
+```text
+> tsx server.ts
+CivicPulse server is running on http://0.0.0.0:3000
+```
+
+Now open your web browser and navigate to:
+👉 **[http://localhost:3000](http://localhost:3000)**
+
+---
+
+### 6. Test on Mobile Devices on the Same Wi-Fi Network
+CivicPulse listens on `0.0.0.0:3000`, allowing you to test real-world camera photo uploads and GPS geolocation directly on your smartphone:
+1. Ensure your phone and computer are connected to the **same Wi-Fi network**.
+2. Find your computer's local IP address:
+   - **Windows**: Run `ipconfig` in Command Prompt (look for *IPv4 Address*, e.g. `192.168.1.45`).
+   - **macOS**: Run `ipconfig getifaddr en0` or check *System Settings > Wi-Fi > Details*.
+   - **Linux**: Run `hostname -I` or `ip a`.
+3. On your phone's browser, navigate to:
+   ```text
+   http://<YOUR_COMPUTER_IP>:3000
+   (Example: http://192.168.1.45:3000)
    ```
-   *(Verifies Haversine distance, duplicate detection radius, priority weighting, admin auth, and statistical aggregation).*
 
-5. **Start the Full-Stack Development Server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+---
 
-6. **Build for Production**:
+### 7. Run Pure Logic Unit Tests
+CivicPulse includes automated unit tests verifying the Haversine distance formula, duplicate detection radius, priority weighting, and admin authentication rules:
+```bash
+npx tsx --test src/utils/civic-rules.test.ts
+```
+Expected output:
+```text
+✔ calculateDistanceMeters accurately computes small geographic distances
+✔ findPotentialDuplicates flags complaints in close proximity with matching category
+✔ computePriorityScore evaluates urgency, hazard risk and community votes
+✔ calculateGamificationTier maps points to appropriate civic rank & badges
+✔ aggregateCivicStats computes resolution rate, counts and wards
+✔ validateAdminCredentials verifies municipal admin and officer logins
+✔ categorizeRaisedVsSolved splits complaints into raised and solved sets
+# tests 7
+# pass 7
+# fail 0
+```
+
+---
+
+### 8. Production Build & Hosting Locally
+If you want to compile an optimized static bundle and run CivicPulse in production mode:
+1. **Build the production bundle**:
    ```bash
    npm run build
+   ```
+   *(This outputs the optimized assets to the `/dist` directory).*
+
+2. **Start the production server**:
+   ```bash
    npm start
    ```
+   *(Express will serve the production `/dist` folder with minimal latency).*
+
+---
+
+### 9. Troubleshooting & FAQs
+
+#### Q1: Error `EADDRINUSE: address already in use :::3000`
+- **Cause**: Another program (or a previous node process) is already using port 3000.
+- **Fix A (Run on a different port)**:
+  ```bash
+  PORT=3001 npm run dev
+  ```
+  *(Then open `http://localhost:3001`)*.
+- **Fix B (Kill existing process)**:
+  - **macOS / Linux**: `npx kill-port 3000` or `lsof -ti :3000 | xargs kill -9`
+  - **Windows**: `npx kill-port 3000` or in PowerShell: `Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Process`
+
+#### Q2: `tsx: command not found`
+- **Fix**: Run `npm install` again to ensure devDependencies are installed, or run with `npx`:
+  ```bash
+  npx tsx server.ts
+  ```
+
+#### Q3: Geolocation button says "Geolocation permission denied"
+- **Fix**: Browsers restrict GPS to `http://localhost` and `https://` origins. When prompted by your browser, click **"Allow Location Access"**. If testing on an external IP without HTTPS, you can still click or drag the pin anywhere on the interactive mini-map to set coordinates manually.
+
+#### Q4: How do I test the Admin Portal?
+- Click the **"Admin Login"** button in the header.
+- Use the quick 1-click **"Municipal Admin"** button (or enter `commissioner@civic.gov.in` with password `admin123`) to unlock the **Raised vs. Solved Reports Dossier**.
 
 ---
 
