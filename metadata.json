@@ -1,0 +1,6 @@
+{
+  "name": "CivicPulse - Smart Civic Issue Reporting Platform",
+  "description": "AI-powered civic issue reporting and municipal tracking platform with GPS geolocation, automated visual classification, duplicate detection, and live complaint tracking.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
